@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const cors = require('cors')
 
-const userRoute = require('./routes/user')
+const authRoute = require('./routes/auth')
 const tweetRoute = require('./routes/tweet')
+const userRoute = require('./routes/user')
 
 const DB_HOST = process.env.DB_HOST || 'mongodb://localhost/food_db'
 const PORT = process.env.PORT || 3000
@@ -18,8 +19,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors())
 
-app.use('/', userRoute)
+app.use('/', authRoute)
 app.use('/tweets', tweetRoute)
+app.use('/users', userRoute)
 
 app.use((err, req, res, next) => {
     console.log(err)
