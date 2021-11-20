@@ -10,25 +10,13 @@ router.get('/', asyncHandler(async (req, res, next) => {
     res.json(users)
 }))
 
-router.get('/:id', asyncHandler(async (req, res, next) => {
-    const user = User.findOne({ _id: req.params.id })
-        .populate('tweets')
+router.get('/:username', asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ username: req.params.username }).exec()
     if (!user) {
         res.sendStatus(404)
         return
     }
-
-    const tweets = await Tweet
-        .find({ author: user._id })
-        .populate('author')
-        .exec()
-    
-    res.json(tweets)
-}))
-
-router.delete('/:id', auth, asyncHandler(async (req, res, next) => {
-    await Tweet.deleteOne({ _id: req.params.id }).exec()
-    res.sendStatus(204)
+    res.json(user)
 }))
 
 module.exports = router
