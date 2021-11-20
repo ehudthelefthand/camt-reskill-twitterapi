@@ -1,0 +1,5 @@
+node_modules
+.env
+/images/avatars/*.png
+/images/avatars/*.jpg
+.DS_store
