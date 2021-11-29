@@ -17,12 +17,6 @@ const tweetSchema = new mongoose.Schema({
             ref: 'User'
         }]
     },
-    retweets: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        }]
-    }
 }, {
     timestamps: true
 })
