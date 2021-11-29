@@ -8,20 +8,20 @@ const SECRET = process.env.SECRET || 'secret'
 module.exports = asyncHandler(async (req, res, next) => {
     const authHeader = req.headers['authorization']
     if (!authHeader) {
-        next()
+        res.sendStatus(401)
         return
     }
 
     const token = authHeader.slice('Bearer '.length)
     if (!token) {
-        next()
+        res.sendStatus(401)
         return
     }
 
     const claim = jwt.verify(token, SECRET)
     const user = await User.findOne({ remember: claim.remember }).exec()
     if (!user) {
-        next()
+        res.sendStatus(401)
         return
     }
 
