@@ -1,6 +1,7 @@
 const express = require('express')
 const asyncHandler = require('express-async-handler')
 const auth = require('../middlewares/auth')
+const setUser = require('../middlewares/setUser')
 const Tweet = require('../models/tweet')
 const User = require('../models/user')
 
@@ -12,14 +13,32 @@ router.post('/', auth, asyncHandler(async (req, res, next) => {
     res.sendStatus(201)
 }))
 
-router.get('/', auth, asyncHandler(async (req, res, next) => {
-    const user = req.User
-    const tweets = await Tweet
-        .find({ author: user._id })
-        .populate('author')
-        .exec()
+router.get('/', setUser, asyncHandler(async (req, res, next) => {
+    const offset = req.query.offset ? Number(req.query.offset) : 0
+    const limit = req.query.limit ? Number(req.query.limit) : 10
     
-    res.json(tweets)
+    let query = Tweet.find()
+        .populate('author', { username: true, avatar: true })
+        .sort({ createdAt: -1 })
+    let total = await query.count().exec()
+    let paginationQuery = query
+        .skip(offset * limit)
+        .limit(limit)
+
+    if (req.User) {
+        const followings = req.User.followings
+        paginationQuery = paginationQuery
+            .where({
+                author: { $in: followings }
+            })
+        res.json(tweets)
+    }
+    
+    const tweets = await paginationQuery.exec()
+    res.json({
+        data: tweets,
+        total: total
+    })
 }))
 
 router.get('/:username', asyncHandler(async (req, res, next) => {

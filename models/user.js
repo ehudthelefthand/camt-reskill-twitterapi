@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
         trim: true,
+        get: avatarPath
     },
     username: {
         type: String,
@@ -45,6 +46,25 @@ const userSchema = new mongoose.Schema({
         type: String,
         select: false,
     },
+    followings: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }]
+    },
+    followers: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }]
+    }
 })
+
+function avatarPath(avatar) {
+    return `/avatars/${avatar}`
+}
+
+userSchema.set('toObject', { getters: true })
+userSchema.set('toJSON', { getters: true })
 
 module.exports = mongoose.model('User', userSchema)

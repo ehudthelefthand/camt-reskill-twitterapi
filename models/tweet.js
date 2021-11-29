@@ -11,6 +11,20 @@ const tweetSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    likes: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }]
+    },
+    retweets: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }]
+    }
+}, {
+    timestamps: true
 })
 
 module.exports = mongoose.model('Tweet', tweetSchema)
