@@ -16,48 +16,70 @@ router.post('/', auth, asyncHandler(async (req, res, next) => {
 router.get('/', setUser, asyncHandler(async (req, res, next) => {
     const offset = req.query.offset ? Number(req.query.offset) : 0
     const limit = req.query.limit ? Number(req.query.limit) : 10
-    
-    let query = Tweet.find()
-        .populate('author', { username: true, avatar: true })
-        .sort({ createdAt: -1 })
-    let total = await query.count().exec()
-    let paginationQuery = query
-        .skip(offset * limit)
-        .limit(limit)
 
     if (req.User) {
-        const followings = req.User.followings
-        paginationQuery = paginationQuery
-            .where({
-                author: { $in: followings }
-            })
-        res.json(tweets)
+        const ids = [ ...req.User.followings, req.User._id ]
+        const total = await findTweet()
+            .where({ author: { $in: ids }})
+            .count()
+            .exec()
+        const tweets = await findTweet()
+            .where({ author: { $in: ids }})
+            .skip(offset * limit)
+            .limit(limit)
+            .exec() 
+        res.json({
+            data: tweets,
+            total: total
+        })
+    } else {
+        let total = await findTweet().count().exec()
+        let tweets = await findTweet()
+            .skip(offset * limit)
+            .limit(limit)
+            .exec()
+        res.json({
+            data: tweets,
+            total: total
+        })
     }
-    
-    const tweets = await paginationQuery.exec()
+}))
+
+router.get('/:userId', asyncHandler(async (req, res, next) => {
+    const offset = req.query.offset ? Number(req.query.offset) : 0
+    const limit = req.query.limit ? Number(req.query.limit) : 10
+
+    const user = await User.findById(req.params.userId).exec()
+    if (!user) {
+        res.sendStatus(404)
+        return
+    }
+
+    const ids = [ ...user.followings, user._id ]
+    const total = await findTweet()
+        .where({ author: { $in: ids }})
+        .count()
+        .exec()
+    const tweets = await findTweet()
+        .where({ author: { $in: ids }})
+        .skip(offset * limit)
+        .limit(limit)
+        .exec() 
     res.json({
         data: tweets,
         total: total
     })
 }))
 
-router.get('/:username', asyncHandler(async (req, res, next) => {
-    const user = await User.findOne({ username: req.params.username }).exec()
-    if (!user) {
-        res.sendStatus(404)
-        return
-    }
-
-    const tweets = await Tweet
-        .find({ author: user._id })
-        .exec()
-    
-    res.json(tweets)
-}))
-
 router.delete('/:id', auth, asyncHandler(async (req, res, next) => {
     await Tweet.deleteOne({ _id: req.params.id }).exec()
     res.sendStatus(204)
 }))
+
+function findTweet() {
+    return Tweet.find()
+        .populate('author', { username: true, avatar: true })
+        .sort({ createdAt: -1 })
+}
 
 module.exports = router
