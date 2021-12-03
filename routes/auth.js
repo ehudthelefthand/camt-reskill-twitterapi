@@ -88,7 +88,14 @@ router.post('/login', asyncHandler(async (req, res) => {
 
 router.get('/me', auth, asyncHandler(async (req, res) => {
     const { username, firstname, lastname, email, phoneNumber, avatar } = req.User
-    const profile = { username, firstname, lastname, email, phoneNumber }
+    const profile = {
+        username,
+        firstname, 
+        lastname,
+        email,
+        phoneNumber,
+        avatar
+    }
     res.json(profile)
 }))
 
