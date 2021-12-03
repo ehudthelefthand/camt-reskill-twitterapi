@@ -121,7 +121,11 @@ router.put('/me/avatar', auth, upload.single('avatar'), asyncHandler(async (req,
         user.avatar = req.file.filename
         await user.save()
         if (oldfilename) {
-            fs.unlinkSync(path.resolve(__dirname, '..', AVATAR_PATH, oldfilename))
+            try {
+                fs.unlinkSync(path.resolve(__dirname, '..', AVATAR_PATH, oldfilename))
+            } catch {
+                console.log('file not found but it is ok.')
+            }
         }
     }
     res.sendStatus(204)
