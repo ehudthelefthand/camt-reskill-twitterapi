@@ -112,7 +112,7 @@ router.get('/me', auth, asyncHandler(async (req, res) => {
 
 router.put('/me', auth, asyncHandler(async (req, res) => {
     const user = req.User
-    const { firstname, lastname, phoneNumber } = req.body
+    const { firstname, lastname, phoneNumber, email } = req.body
     if (firstname) {
         user.firstname = firstname
     }
