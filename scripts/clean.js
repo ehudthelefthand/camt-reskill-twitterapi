@@ -4,7 +4,7 @@ const Tweet = require('../models/tweet')
 
 async function run() {
     const tweets = await Tweet.find().populate('author').exec()
-    const hangingTweets = tweets.filter(t => t.author === null)
+    const hangingTweets = tweets.filter(t => !!t.author)
     console.log(hangingTweets)
     const ids = hangingTweets.map(ht => ht._id)
     await Tweet.deleteMany({ _id: { $in: ids } })
