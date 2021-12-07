@@ -15,3 +15,6 @@ mongoose.connect('mongodb://localhost/twitter_db')
     .catch(err => {
         console.error(err)
     })
+    .finally(() => {
+        await mongoose.disconnect()
+    })
