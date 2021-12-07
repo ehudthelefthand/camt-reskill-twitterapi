@@ -19,7 +19,9 @@ module.exports = asyncHandler(async (req, res, next) => {
     }
 
     const claim = jwt.verify(token, SECRET)
-    const user = await User.findOne({ remember: claim.remember }).exec()
+    console.log(claim)
+    const user = await User.findOne({ remember: claim.remember, deleted: false }).exec()
+    console.log(user)
     if (!user) {
         res.sendStatus(401)
         return

@@ -8,6 +8,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const User = require('../models/user')
 const auth = require('../middlewares/auth')
+const Tweet = require('../models/tweet')
 
 const SECRET = process.env.SECRET || 'secret'
 const TOKEN_EXPIRE = process.env.TOKEN_EXPIRE || '8h'
@@ -61,7 +62,7 @@ router.post('/register', upload.single('avatar'), asyncHandler(async (req, res) 
 
 router.post('/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body
-    const user = await User.findOne({ username }).select("+password").exec()
+    const user = await User.findOne({ username, deleted: false }).select("+password").exec()
     if (!user) {
         res.sendStatus(401)
         return
@@ -87,27 +88,7 @@ router.post('/login', asyncHandler(async (req, res) => {
 }))
 
 router.get('/me', auth, asyncHandler(async (req, res) => {
-    const { 
-        _id,
-        username,
-        firstname,
-        lastname,
-        email,
-        phoneNumber,
-        avatar
-    } = req.User
-
-    const profile = {
-        _id,
-        username,
-        firstname, 
-        lastname,
-        email,
-        phoneNumber,
-        avatar
-    }
-
-    res.json(profile)
+    res.json(req.User)
 }))
 
 router.put('/me', auth, asyncHandler(async (req, res) => {
@@ -147,7 +128,10 @@ router.put('/me/avatar', auth, upload.single('avatar'), asyncHandler(async (req,
 }))
 
 router.delete('/me', auth, asyncHandler(async (req, res) => {
-    await User.deleteOne({ _id: req.User._id })
+    await User.findByIdAndUpdate(req.User._id, { 
+        deleted: true, 
+        $unset: { remember: 1 }
+    }).exec()
     res.sendStatus(204)
 }))
 

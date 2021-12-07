@@ -21,4 +21,6 @@ const tweetSchema = new mongoose.Schema({
     timestamps: true
 })
 
+tweetSchema.set('toObject', { getters: true })
+
 module.exports = mongoose.model('Tweet', tweetSchema)

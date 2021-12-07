@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         select: false,
     },
+    deleted: {
+        type: Boolean,
+        default: false
+    },
     followings: {
         type: [{
             type: Schema.Types.ObjectId,

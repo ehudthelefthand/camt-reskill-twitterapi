@@ -8,8 +8,8 @@ const router = express.Router()
 
 router.post('/', auth, asyncHandler(async (req, res, next) => {
     const { text } = req.body
-    await Tweet.create({ text, author: req.User._id })
-    res.sendStatus(201)
+    const tweet = await Tweet.create({ text, author: req.User._id })
+    res.status(201).json(tweet)
 }))
 
 router.get('/', asyncHandler(async (req, res, next) => {
@@ -82,7 +82,7 @@ router.post('/:id/unlikes', auth, asyncHandler(async (req, res, next) => {
 
 function findTweet() {
     return Tweet.find()
-        .populate('author', { username: true, avatar: true })
+        .populate('author', 'username avatar deleted')
         .sort({ createdAt: -1 })
 }
 

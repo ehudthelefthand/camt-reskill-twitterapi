@@ -8,7 +8,7 @@ const authRoute = require('./routes/auth')
 const tweetRoute = require('./routes/tweet')
 const userRoute = require('./routes/user')
 
-const DB_HOST = process.env.DB_HOST || 'mongodb://localhost/food_db'
+const DB_HOST = process.env.DB_HOST || 'mongodb://localhost/twitter_db'
 const PORT = process.env.PORT || 3000
 
 const app = express()
