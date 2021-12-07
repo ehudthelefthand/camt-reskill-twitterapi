@@ -65,7 +65,9 @@ const userSchema = new mongoose.Schema({
 })
 
 function avatarPath(avatar) {
-    return `/avatars/${avatar}`
+    if (avatar) {
+        return `/avatars/${avatar}`    
+    }
 }
 
 userSchema.set('toObject', { getters: true })
